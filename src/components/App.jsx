@@ -1,26 +1,15 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Searchbar from './Searchbar/Searchbar';
 
-export default class App extends Component {
-  state = {
-    query: '',
-    totalHits: null,
-  };
+export default function App() {
+  const [query, setQuery] = useState('');
+  const [totalHits, setTotalHits] = useState(null);
 
-  handleFormSubmit = query => {
-    this.setState({ query });
-  };
-
-  render() {
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery
-          query={this.state.query}
-          totalHits={this.state.totalHits}
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Searchbar onSubmit={setQuery} />
+      <ImageGallery query={query} totalHits={totalHits} />
+    </div>
+  );
 }
