@@ -5,15 +5,14 @@ import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Loader from 'components/Loader/Loader';
 import Modal from 'components/Modal/Modal';
 
+import { fetchImg } from 'components/serveces/fetchImg';
+
 import css from './ImageGallery.module.css';
 
-const API_KEY = '33411658-9504db49656fc0db308898fd3';
-
-export default function ImageGallery({ query }) {
+export default function ImageGallery({ query, page, setPage }) {
   const [hits, setHits] = useState([]);
   const [status, setStatus] = useState('idle');
   const [totalHits, setTotalHits] = useState(null);
-  const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [largeImg, setLargeImg] = useState('');
 
@@ -23,18 +22,32 @@ export default function ImageGallery({ query }) {
     }
 
     setStatus('pending');
-    setHits([]);
-    setPage(1);
 
-    fetch(
-      `https://pixabay.com/api/?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then(res => res.json())
-      .then(query => {
-        setHits(query.hits);
-        setTotalHits(query.totalHits);
+    const fetchData = async () => {
+      try {
+        const request = await fetchImg(page, query);
+        setHits(request.hits);
+        setTotalHits(request.totalHits);
         setStatus('resolved');
-      });
+      } catch (error) {
+        console.log(`🚀 ~ fetchData ~ error:`, error);
+      }
+    };
+
+    fetchData();
+
+    // Альтернатива
+
+    // fetchImg(page, query)
+    //   .then(res => {
+    //     setHits(res.hits);
+    //     setTotalHits(res.totalHits);
+    //     setStatus('resolved');
+    //   })
+    //   .catch(er => {
+    //     console.log(er);
+    //   });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
@@ -45,14 +58,18 @@ export default function ImageGallery({ query }) {
 
     setStatus('pending');
 
-    fetch(
-      `https://pixabay.com/api/?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then(res => res.json())
-      .then(query => {
-        setHits([...hits, ...query.hits]);
+    const fetchData = async () => {
+      try {
+        const request = await fetchImg(page, query);
+        setHits([...hits, ...request.hits]);
         setStatus('resolved');
-      });
+      } catch (error) {
+        console.log(`🚀 ~ fetchData ~ error:`, error);
+      }
+    };
+
+    fetchData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
